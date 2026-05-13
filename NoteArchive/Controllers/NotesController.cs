@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NoteArchive.Data;
 using NoteArchive.Models;
+using System.Security.Claims;
+using System.IO.Compression;
 
 namespace NoteArchive.Controllers
 {
@@ -22,8 +24,11 @@ namespace NoteArchive.Controllers
         // GET: Notes
         public async Task<IActionResult> Index()
         {
-            var noteArchiveContext = _context.Notes.Include(n => n.User);
-            return View(await noteArchiveContext.ToListAsync());
+            var notes = _context.Notes
+            .Include(n => n.Images)
+            .ToList();
+
+            return View(notes);
         }
 
         // GET: Notes/Details/5
@@ -35,8 +40,9 @@ namespace NoteArchive.Controllers
             }
 
             var note = await _context.Notes
-                .Include(n => n.User)
-                .FirstOrDefaultAsync(m => m.ID == id);
+            .Include(n => n.Images)
+            .FirstOrDefaultAsync(m => m.ID == id);
+
             if (note == null)
             {
                 return NotFound();
@@ -122,6 +128,48 @@ namespace NoteArchive.Controllers
             return View(note);
         }
 
+        public async Task<IActionResult> DownloadImages(int id)
+        {
+            var note = await _context.Notes
+                .Include(n => n.Images)
+                .FirstOrDefaultAsync(n => n.ID == id);
+
+            if (note == null)
+            {
+                return NotFound();
+            }
+
+            using var memoryStream = new MemoryStream();
+
+            using (var zip = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var image in note.Images)
+                {
+                    var path = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot",
+                        image.ImagePath.TrimStart('/'));
+
+                    if (System.IO.File.Exists(path))
+                    {
+                        var entry = zip.CreateEntry(Path.GetFileName(path));
+
+                        using var entryStream = entry.Open();
+                        using var fileStream = System.IO.File.OpenRead(path);
+
+                        await fileStream.CopyToAsync(entryStream);
+                    }
+                }
+            }
+
+            memoryStream.Position = 0;
+
+            return File(
+                memoryStream.ToArray(),
+                "application/zip",
+                $"{note.Title}.zip");
+        }
+
         // GET: Notes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -129,10 +177,18 @@ namespace NoteArchive.Controllers
             {
                 return NotFound();
             }
+            
 
             var note = await _context.Notes
                 .Include(n => n.User)
                 .FirstOrDefaultAsync(m => m.ID == id);
+                 
+            if (note.UserID != User.FindFirstValue(ClaimTypes.NameIdentifier)
+                && !User.IsInRole("Administrator"))
+            {
+                return Forbid();
+            }
+
             if (note == null)
             {
                 return NotFound();
