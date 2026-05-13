@@ -2,6 +2,24 @@
 @using System.Security.Claims
 
 <div class="row">
+
+<form asp-action="Index" method="get" class="mb-4">
+
+    <div class="input-group">
+
+        <input type="text"
+               name="searchString"
+               class="form-control"
+               placeholder="Search notes..." />
+
+        <button type="submit"
+                class="btn btn-primary">
+            Search
+        </button>
+
+    </div>
+</form>
+
 @if (User.Identity!.IsAuthenticated)
 {
     <div class="col-md-3 mb-4">

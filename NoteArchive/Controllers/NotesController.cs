@@ -24,15 +24,24 @@ namespace NoteArchive.Controllers
         }
 
         // GET: Notes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
             var notes = _context.Notes
-            .Include(n => n.Images)
-            .ToList();
+                .Include(n => n.Images)
+                .AsQueryable();
 
-            return View(notes);
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                notes = notes.Where(n =>
+                    n.Title.Contains(searchString) ||
+                    n.Author.Contains(searchString) ||
+                    n.Genre.Contains(searchString) ||
+                    n.Performer.Contains(searchString));
+            }
+
+            return View(await notes.ToListAsync());
         }
-
+        
         // GET: Notes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -65,57 +74,55 @@ namespace NoteArchive.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> Create(
-    Note note,
-    List<IFormFile> files)
-{
-    note.UserID = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-
-    ModelState.Remove("UserID");
-
-    if (ModelState.IsValid)
-    {
-        _context.Notes.Add(note);
-
-        await _context.SaveChangesAsync();
-
-        if (files != null && files.Count > 0)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Note note,List<IFormFile> files)
         {
-            foreach (var file in files)
+            note.UserID = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+            ModelState.Remove("UserID");
+
+            if (ModelState.IsValid)
             {
-                var fileName =
-                    Guid.NewGuid().ToString()
-                    + Path.GetExtension(file.FileName);
+                _context.Notes.Add(note);
 
-                var uploadPath = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "wwwroot/uploads",
-                    fileName);
+                await _context.SaveChangesAsync();
 
-                using (var stream =
-                    new FileStream(uploadPath, FileMode.Create))
+                if (files != null && files.Count > 0)
                 {
-                    await file.CopyToAsync(stream);
+                    foreach (var file in files)
+                    {
+                        var fileName =
+                            Guid.NewGuid().ToString()
+                            + Path.GetExtension(file.FileName);
+
+                        var uploadPath = Path.Combine(
+                            Directory.GetCurrentDirectory(),
+                            "wwwroot/uploads",
+                            fileName);
+
+                        using (var stream =
+                            new FileStream(uploadPath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        var image = new NoteImage
+                        {
+                            ImagePath = "/uploads/" + fileName,
+                            NoteID = note.ID
+                        };
+
+                        _context.NoteImages.Add(image);
+                    }
+
+                    await _context.SaveChangesAsync();
                 }
 
-                var image = new NoteImage
-                {
-                    ImagePath = "/uploads/" + fileName,
-                    NoteID = note.ID
-                };
-
-                _context.NoteImages.Add(image);
+                return RedirectToAction(nameof(Index));
             }
 
-            await _context.SaveChangesAsync();
+            return View(note);
         }
-
-        return RedirectToAction(nameof(Index));
-    }
-
-    return View(note);
-}
         // GET: Notes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
