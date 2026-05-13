@@ -8,42 +8,86 @@
 
 <h4>Note</h4>
 <hr />
+
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <form asp-action="Create"
+              enctype="multipart/form-data">
+
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger"></div>
+
             <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <label asp-for="Title"
+                       class="control-label"></label>
+
+                <input asp-for="Title"
+                       class="form-control" />
+
+                <span asp-validation-for="Title"
+                      class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="Author" class="control-label"></label>
-                <input asp-for="Author" class="form-control" />
-                <span asp-validation-for="Author" class="text-danger"></span>
+                <label asp-for="Author"
+                       class="control-label"></label>
+
+                <input asp-for="Author"
+                       class="form-control" />
+
+                <span asp-validation-for="Author"
+                      class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="Genre" class="control-label"></label>
-                <input asp-for="Genre" class="form-control" />
-                <span asp-validation-for="Genre" class="text-danger"></span>
+                <label asp-for="Genre"
+                       class="control-label"></label>
+
+                <input asp-for="Genre"
+                       class="form-control" />
+
+                <span asp-validation-for="Genre"
+                      class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="Performer" class="control-label"></label>
-                <input asp-for="Performer" class="form-control" />
-                <span asp-validation-for="Performer" class="text-danger"></span>
+                <label asp-for="Performer"
+                       class="control-label"></label>
+
+                <input asp-for="Performer"
+                       class="form-control" />
+
+                <span asp-validation-for="Performer"
+                      class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="PublicationDate" class="control-label"></label>
-                <input asp-for="PublicationDate" class="form-control" />
-                <span asp-validation-for="PublicationDate" class="text-danger"></span>
+                <label asp-for="PublicationDate"
+                       class="control-label"></label>
+
+                <input asp-for="PublicationDate"
+                       class="form-control" />
+
+                <span asp-validation-for="PublicationDate"
+                      class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="UserID" class="control-label"></label>
-                <select asp-for="UserID" class ="form-control" asp-items="ViewBag.UserID"></select>
+
+            <div class="form-group mt-3">
+                <label>Images</label>
+
+                <input type="file"
+                       name="files"
+                       multiple
+                       class="form-control" />
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+            <div class="form-group mt-3">
+                <input type="submit"
+                       value="Create"
+                       class="btn btn-primary" />
             </div>
+
         </form>
     </div>
 </div>
@@ -52,3 +96,8 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

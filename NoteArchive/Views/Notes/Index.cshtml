@@ -1,65 +1,87 @@
 @model IEnumerable<NoteArchive.Models.Note>
+@using System.Security.Claims
 
-@{
-    ViewData["Title"] = "Index";
+<div class="row">
+
+<form asp-action="Index" method="get" class="mb-4">
+
+    <div class="input-group">
+
+        <input type="text"
+               name="searchString"
+               class="form-control"
+               placeholder="Search notes..." />
+
+        <button type="submit"
+                class="btn btn-primary">
+            Search
+        </button>
+
+    </div>
+</form>
+
+@if (User.Identity!.IsAuthenticated)
+{
+    <div class="col-md-3 mb-4">
+        <a asp-action="Create"
+           class="text-decoration-none text-dark">
+
+            <div class="card h-100 d-flex
+                        justify-content-center
+                        align-items-center"
+                 style="height:100%; min-height:420px;">
+
+                <div style="font-size:80px;">
+                    +
+                </div>
+            </div>
+        </a>
+    </div>
 }
 
-<h1>Index</h1>
+@foreach (var item in Model)
+{
+    <div class="col-md-3 mb-4">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Author)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Genre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Performer)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PublicationDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Author)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Genre)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Performer)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PublicationDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-            </td>
-        </tr>
+        <div class="card h-100">
+
+            @{
+                var preview = item.Images?.FirstOrDefault();
+            }
+
+            @if (preview != null)
+            {
+                <img src="@preview.ImagePath"
+                     class="card-img-top"
+                     style="height:300px; object-fit:cover;" />
+            }
+
+            <div class="card-body">
+
+                <h5>@item.Title</h5>
+
+                <p>@item.Author</p>
+
+                <a asp-action="Details"
+                   asp-route-id="@item.ID"
+                   class="btn btn-primary">
+                    Open
+                </a>
+
+                @if (
+                    User.IsInRole("Administrator")
+                    || User.FindFirstValue(ClaimTypes.NameIdentifier) == item.UserID
+                )
+                {
+                    <a asp-action="Delete"
+                       asp-route-id="@item.ID"
+                       class="btn btn-danger">
+                        Delete
+                    </a>
+                }
+
+            </div>
+        </div>
+    </div>
 }
-    </tbody>
-</table>
+</div>
