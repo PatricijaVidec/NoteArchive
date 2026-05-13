@@ -2,6 +2,25 @@
 @using System.Security.Claims
 
 <div class="row">
+@if (User.Identity!.IsAuthenticated)
+{
+    <div class="col-md-3 mb-4">
+        <a asp-action="Create"
+           class="text-decoration-none text-dark">
+
+            <div class="card h-100 d-flex
+                        justify-content-center
+                        align-items-center"
+                 style="height:100%; min-height:420px;">
+
+                <div style="font-size:80px;">
+                    +
+                </div>
+            </div>
+        </a>
+    </div>
+}
+
 @foreach (var item in Model)
 {
     <div class="col-md-3 mb-4">

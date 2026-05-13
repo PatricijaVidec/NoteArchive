@@ -9,6 +9,8 @@ using NoteArchive.Data;
 using NoteArchive.Models;
 using System.Security.Claims;
 using System.IO.Compression;
+using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NoteArchive.Controllers
 {
@@ -52,6 +54,7 @@ namespace NoteArchive.Controllers
         }
 
         // GET: Notes/Create
+        
         public IActionResult Create()
         {
             ViewData["UserID"] = new SelectList(_context.Users, "Id", "Id");
@@ -62,19 +65,57 @@ namespace NoteArchive.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Title,Author,Genre,Performer,PublicationDate,UserID")] Note note)
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Create(
+    Note note,
+    List<IFormFile> files)
+{
+    note.UserID = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+    ModelState.Remove("UserID");
+
+    if (ModelState.IsValid)
+    {
+        _context.Notes.Add(note);
+
+        await _context.SaveChangesAsync();
+
+        if (files != null && files.Count > 0)
         {
-            if (ModelState.IsValid)
+            foreach (var file in files)
             {
-                _context.Add(note);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var fileName =
+                    Guid.NewGuid().ToString()
+                    + Path.GetExtension(file.FileName);
+
+                var uploadPath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "wwwroot/uploads",
+                    fileName);
+
+                using (var stream =
+                    new FileStream(uploadPath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                var image = new NoteImage
+                {
+                    ImagePath = "/uploads/" + fileName,
+                    NoteID = note.ID
+                };
+
+                _context.NoteImages.Add(image);
             }
-            ViewData["UserID"] = new SelectList(_context.Users, "Id", "Id", note.UserID);
-            return View(note);
+
+            await _context.SaveChangesAsync();
         }
 
+        return RedirectToAction(nameof(Index));
+    }
+
+    return View(note);
+}
         // GET: Notes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -97,7 +138,8 @@ namespace NoteArchive.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Title,Author,Genre,Performer,PublicationDate,UserID")] Note note)
+        [Authorize]
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Title,Author,Genre,Performer,PublicationDate")] Note note)
         {
             if (id != note.ID)
             {
@@ -178,20 +220,19 @@ namespace NoteArchive.Controllers
                 return NotFound();
             }
             
-
             var note = await _context.Notes
                 .Include(n => n.User)
                 .FirstOrDefaultAsync(m => m.ID == id);
                  
+            if (note == null)
+            {
+                return NotFound();
+            }
+
             if (note.UserID != User.FindFirstValue(ClaimTypes.NameIdentifier)
                 && !User.IsInRole("Administrator"))
             {
                 return Forbid();
-            }
-
-            if (note == null)
-            {
-                return NotFound();
             }
 
             return View(note);
@@ -203,12 +244,22 @@ namespace NoteArchive.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var note = await _context.Notes.FindAsync(id);
-            if (note != null)
+
+            if (note == null)
             {
-                _context.Notes.Remove(note);
+                return NotFound();
             }
 
+            if (note.UserID != User.FindFirstValue(ClaimTypes.NameIdentifier)
+                && !User.IsInRole("Administrator"))
+            {
+                return Forbid();
+            }
+
+            _context.Notes.Remove(note);
+
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
