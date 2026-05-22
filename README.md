@@ -1,0 +1,46 @@
+## **WELCOME TO NOTE ARCHIVE**
+
+## Overview
+Note Archive is a web application built with **.NET 8 MVC** that allows users to securely archive, manage, and restore digital copies of their music sheets.
+
+The purpose of the application is to ensure that important sheet music is never permanently lost.  
+If a physical copy becomes damaged, destroyed, or misplaced, users can simply download the archived file, and print it again.
+
+
+## Features
+
+- User authentication and authorization
+- Upload and archive music sheets
+- Download archived sheets
+- File organization and management
+- Search and filtering functionality
+- File metadata management
+- Print-ready document downloads
+
+## Technologies Used
+
+- **.NET 8**
+- **ASP.NET Core MVC**
+- **Entity Framework Core**
+- **SQL Server**
+- **Docker**
+- **Bootstrap 5**
+- **Razor Views**
+- **Identity Authentication**
+
+# **DOWNLOAD**
+1. clone the repository
+```bash
+git clone https://github.com/PatricijaVidec/NoteArchive
+```
+2. navigate to the repository
+```bash
+cd NoteArchive
+```
+3. make sure you run a docker container
+4. Then you must update the database and run the aplication
+```bash
+dotnet ef database update
+dotnet run
+```
+5. open the localhost link it provides
