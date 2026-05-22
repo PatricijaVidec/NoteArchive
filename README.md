@@ -29,18 +29,18 @@ If a physical copy becomes damaged, destroyed, or misplaced, users can simply do
 - **Identity Authentication**
 
 # **DOWNLOAD**
-1. clone the repository
+1. Clone the repository
 ```bash
 git clone https://github.com/PatricijaVidec/NoteArchive
 ```
-2. navigate to the repository
+2. Navigate to the repository
 ```bash
 cd NoteArchive
 ```
-3. make sure you run a docker container
+3. Make sure you run a docker container
 4. Then you must update the database and run the aplication
 ```bash
 dotnet ef database update
 dotnet run
 ```
-5. open the localhost link it provides
+5. Open the localhost link it provides
