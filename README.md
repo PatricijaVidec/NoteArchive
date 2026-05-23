@@ -37,13 +37,11 @@ git clone https://github.com/PatricijaVidec/NoteArchive
 ```bash
 cd NoteArchive
 ```
-3. Make sure you run a docker container
-
-  3.1 you can download Docker [here](https://www.docker.com/products/docker-desktop/)
-  3.2 then to run the docker container you run this code (windows)
-   ```bash
-   docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=yourStrong(!)Password" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-CU15-GDR1-ubuntu-22.04
-   ```
+3. Make sure you run a docker container, you can download it [here](https://www.docker.com/products/docker-desktop/)
+4. then to run the docker container you run this code (windows)
+```bash
+docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=yourStrong(!)Password" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-CU15-GDR1-ubuntu-22.04
+```
 5. Then you must update the database and run the aplication
 ```bash
 dotnet ef database update
