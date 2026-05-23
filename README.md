@@ -38,6 +38,7 @@ git clone https://github.com/PatricijaVidec/NoteArchive
 cd NoteArchive
 ```
 3. Make sure you run a docker container
+
   3.1 you can download Docker [here](https://www.docker.com/products/docker-desktop/)
   3.2 then to run the docker container you run this code (windows)
    ```bash
