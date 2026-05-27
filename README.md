@@ -38,7 +38,7 @@ git clone https://github.com/PatricijaVidec/NoteArchive
 cd NoteArchive
 ```
 3. Make sure you run a docker container, you can download it [here](https://www.docker.com/products/docker-desktop/)
-4. then to run the docker container you run this code (windows)
+4. then to run the docker container you run this code (Windows)
 ```bash
 docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=yourStrong(!)Password" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-CU15-GDR1-ubuntu-22.04
 ```
