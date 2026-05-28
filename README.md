@@ -48,3 +48,6 @@ dotnet ef database update
 dotnet run
 ```
 5. Open the localhost link it provides
+```bash
+http://localhost:XXXX
+```
