@@ -29,7 +29,7 @@ If a physical copy becomes damaged, destroyed, or misplaced, users can simply do
 - **Identity Authentication**
 
 # **DOWNLOAD**
-1. Clone the repository
+1. Clone this repository
 ```bash
 git clone https://github.com/PatricijaVidec/NoteArchive
 ```
@@ -37,7 +37,7 @@ git clone https://github.com/PatricijaVidec/NoteArchive
 ```bash
 cd NoteArchive
 ```
-3. Make sure you run a docker container, you can download it [here](https://www.docker.com/products/docker-desktop/)
+3. Make sure you run a docker container (you can download it [here](https://www.docker.com/products/docker-desktop/))
 4. then to run the docker container you run this code (Windows)
 ```bash
 docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=yourStrong(!)Password" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-CU15-GDR1-ubuntu-22.04
